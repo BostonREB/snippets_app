@@ -25,10 +25,6 @@ def get(name):
   logging.error("FIXME: Unimplemented - get({!r})".format(name))
   return ""
 
-  action = "put"
-  subject = "list"
-  snip = "A sequence of things created using []"
-
 # Main
 def main():
   """Main function"""
@@ -42,6 +38,11 @@ def main():
   put_parser = subparsers.add_parser("put", help="Store a snippet")
   put_parser.add_argument("name", help="The name of the snippet")
   put_parser.add_argument("snippet", help="The snippet text")
+
+  #Subparser for the get command
+  logging.debug("Contructing get subparser")
+  get_parser = subparsers.add_parser("get", help="Retrieve a snippet")
+  get_parser.add_argument("name", help="The name of the snippet")
 
   arguments = parser.parse_args(sys.argv[1:])
 
