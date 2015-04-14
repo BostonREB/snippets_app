@@ -1,29 +1,36 @@
-import sys
+import psycopg2
 import logging
+import sys
 import argparse
 
 #set the log output file, and the log fevel
 logging.basicConfig(finename="snippets.log", level=logging.DEBUG)
 
-def put(name, snippet):
-  """
-  Store a snippet with an associated name.
+logging.debug("Connecting to PostgreSQL")
+connection = psycopg2.connect("dbname='snippets' host='localhost'")
+logging.debug("Database connection established.")
 
-  Returns the name of the snippet.
-  """
+
+def put(name, snippet):
+  """ Store a snippet with an associated name."""
   logging.error("FIXME: Unimplemented - put({!r}, {!r}".format(name, snippet))
+  cursor = connection.cursor()
+  command = "insert into snippets values (%s, %s)"
+  cursor.execute(command, (name, snippet))
+  connection.commit()
+  logging.debug("Snippet stored successfully")
   return name, snippet
 
 def get(name):
-  """
-  Retrieve the snippet with the given name.
-
-  If there is no snippet an error will be generated.
-
-  Returns the snippet.
-  """
+  """Retrieve the snippet with the given name."""
   logging.error("FIXME: Unimplemented - get({!r})".format(name))
-  return ""
+  cursor = connection.cursor()
+  # command = "select * from snippets where keyword = '%s'", (name)
+  cursor.execute("select message from snippets where keyword = %s", (name,))
+  row = cursor.fetchone()
+  connection.commit()
+  logging.debug("Snippet successfully retrieved")
+  return row
 
 # Main
 def main():
