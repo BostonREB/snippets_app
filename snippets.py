@@ -37,6 +37,14 @@ def get(name):
   else:
     return row[0]
 
+def index():
+  """Present of list of snippet names"""
+  logging.error("FIXME: Unimplemented - index")
+  with connection, connection.cursor() as cursor:
+      cursor.execute("select keyword from snippets order by keyword")
+      names = cursor.fetchall()
+  return names
+
 # Main
 def main():
   """Main function"""
@@ -56,6 +64,10 @@ def main():
   get_parser = subparsers.add_parser("get", help="Retrieve a snippet")
   get_parser.add_argument("name", help="The name of the snippet")
 
+  #Supbarser for the catalog command
+  logging.debug("Constructing index subparser")
+  catalog_parser = subparsers.add_parser("index", help="Get a list of key names")
+
   arguments = parser.parse_args(sys.argv[1:])
 
   # Convert parsed arguments from Namespace to dictionary
@@ -71,6 +83,13 @@ def main():
       print "There is no snippet with the name %s." % arguments.values()[0].upper()
     else:
       print ("Retrieved snippet: {!r}".format(snippet))
+  elif command == "index":
+    names = index()
+    print "The following is a list of existing snippet names:"
+    for name in names:
+      name = name[0]
+      print name
+
 
 
 if __name__ == "__main__":
