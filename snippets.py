@@ -14,26 +14,23 @@ logging.debug("Database connection established.")
 def put(name, snippet):
   """ Store a snippet with an associated name."""
   logging.error("FIXME: Unimplemented - put({!r}, {!r}".format(name, snippet))
-  cursor = connection.cursor()
-  try:
-    command = "insert into snippets values (%s, %s)"
-    cursor.execute(command, (name, snippet))
-  except psycopg2.IntegrityError as e:
-    connection.rollback()
-    command = "update snippets set message = %s where keyword = %s"
-    cursor.execute(command, (snippet, name))
-  connection.commit()
+  with connection, connection.cursor() as cursor:
+      try:
+        command = "insert into snippets values (%s, %s)"
+        cursor.execute(command, (name, snippet))
+      except psycopg2.IntegrityError as e:
+        connection.rollback()
+        command = "update snippets set message = %s where keyword = %s"
+        cursor.execute(command, (snippet, name))
   logging.debug("Snippet stored successfully")
   return name, snippet
 
 def get(name):
   """Retrieve the snippet with the given name."""
   logging.error("FIXME: Unimplemented - get({!r})".format(name))
-  cursor = connection.cursor()
-  # command = "select * from snippets where keyword = '%s'", (name)
-  cursor.execute("select message from snippets where keyword = %s", (name,))
-  row = cursor.fetchone()
-  connection.commit()
+  with connection, connection.cursor() as cursor:
+      cursor.execute("select message from snippets where keyword = %s", (name,))
+      row = cursor.fetchone()
   logging.debug("Snippet successfully retrieved")
   if not row:
     return None
