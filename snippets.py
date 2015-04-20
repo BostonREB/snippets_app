@@ -45,6 +45,18 @@ def index():
       names = cursor.fetchall()
   return names
 
+def search(term):
+  """SEarch snippets for a specific term."""
+  logging.error("FIXME: Unimplemented - search({!r})".format(term))
+  with connection, connection.cursor() as cursor:
+      cursor.execute("select * from snippets where message like %s", (term,))
+      rows = cursor.fetchall()
+  logging.debug("Snippet successfully found")
+  if not rows:
+    return None
+  else:
+    return rows
+
 # Main
 def main():
   """Main function"""
@@ -68,6 +80,11 @@ def main():
   logging.debug("Constructing index subparser")
   catalog_parser = subparsers.add_parser("index", help="Get a list of key names")
 
+  #Subparser for the search command
+  logging.debug("Contructing search subparser")
+  search_parser = subparsers.add_parser("search", help="Search snippets for specific term")
+  search_parser.add_argument("term", help="The term to search for in the snippets")
+
   arguments = parser.parse_args(sys.argv[1:])
 
   # Convert parsed arguments from Namespace to dictionary
@@ -89,8 +106,13 @@ def main():
     for name in names:
       name = name[0]
       print name
-
-
+  elif command == "search":
+    results = search(**arguments)
+    if results == None:
+      print "No snippets match the search term"
+    else:
+      for result in results:
+        print "%s: %s" % (result[0], result[1])
 
 if __name__ == "__main__":
     main()
